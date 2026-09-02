@@ -14,14 +14,17 @@ def import_sound(asset_name: str):
 
 
 SPRITES = {
-    
+    "backdrop": "grass_background.png",
+    "road": "FieldsTile_20.png"
 }
 
 IMAGE_SPRITES = {}
 
-for sprite_index, sprite_name in SPRITES.items():
-    img = import_image(sprite_name)
-    for flipped_x in (True, False):
-        for flipped_y in (True, False):
-            new_img = pygame.transform.flip(img, flip_x = flipped_x, flip_y = flipped_y)
-            IMAGE_SPRITES[(flipped_x, flipped_y, sprite_index)] = new_img
+def load_all_images():
+    for sprite_index, sprite_name in SPRITES.items():
+        img = import_image(sprite_name)
+        for flipped_x in (True, False):
+            for flipped_y in (True, False):
+                new_img = pygame.transform.flip(img, flip_x = flipped_x, flip_y = flipped_y)
+                IMAGE_SPRITES[(flipped_x, flipped_y, sprite_index)] = new_img
+

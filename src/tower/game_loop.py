@@ -1,11 +1,13 @@
 import pygame
 from dataclasses import dataclass
-from tower.game import TowerGame
 from tower.state import GameState
+from tower.asset_loader import IMAGE_SPRITES
+
+DESIRED_FPS = 60
 
 @dataclass
 class GameLoop:
-    game: TowerGame
+    game: "TowerGame"
     
     def handle_events(self):
         
@@ -32,11 +34,18 @@ class GameLoop:
         return self.game.screen
     
     @property
-    def screen(self):
+    def state(self):
         return self.game.state
     
 class GameMenu(GameLoop):
-    pass
+    def loop(self):
+        clock = pygame.time.Clock()
+        self.screen.blit(IMAGE_SPRITES[(False, False, "backdrop")], (0, 0))
+        while self.state == GameState.main_menu:
+            self.handle_events()
+            pygame.display.flip()
+            pygame.display.set_caption(f"FPS {round(clock.get_fps())}")
+            clock.tick(DESIRED_FPS)
 
 class GameEditing(GameLoop):
     pass
