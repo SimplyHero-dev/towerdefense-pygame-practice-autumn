@@ -13,7 +13,7 @@ classifiers = [
 ]
 dependencies = [
     "click==8.*",
-    "pygame==2.*",
+    "pygame-ce==2.*",
     "structlog",
 ]
 
