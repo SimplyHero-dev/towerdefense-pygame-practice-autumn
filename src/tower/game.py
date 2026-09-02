@@ -52,8 +52,9 @@ class TowerGame:
         pygame.font.init()
         self.screen = screen
 
-        from tower.asset_loader import load_all_images
+        from tower.asset_loader import load_all_images, load_all_sounds
         load_all_images()
+        load_all_sounds()
 
         self.set_state(GameState.initialized)
         self.game_menu = GameMenu(game = self)
