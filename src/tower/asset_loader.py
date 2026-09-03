@@ -27,6 +27,7 @@ SPRITES = {
     "backdrop": "grass_background.png",
     "road": "FieldsTile_20.png",
     "game_logo": "game_logo.png",
+    "shrub": "6.png",
 }
 
 IMAGE_SPRITES = {}
