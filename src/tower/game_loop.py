@@ -2,7 +2,7 @@ import pygame
 from dataclasses import dataclass
 from tower.state import GameState
 from tower.asset_loader import IMAGE_SPRITES
-from tower.sprites import Background
+from tower.sprites import Background, Shrub
 
 DESIRED_FPS = 60
 
@@ -52,6 +52,12 @@ class GameMenu(GameLoop):
             index = "game_logo",
             orientation = 0,
             position = self.game.screen_rect.center,
+        )
+        bush = Shrub.create_from_tile(
+            groups = [group],
+            index = "shrub",
+            orientation = 0,
+            position = (320, 320),
         )
         rotation = 0
         while self.state == GameState.main_menu:
