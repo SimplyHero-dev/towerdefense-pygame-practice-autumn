@@ -1,5 +1,6 @@
 import pygame
 from tower.asset_loader import IMAGE_SPRITES
+import enum
 
 class Sprite(pygame.sprite.Sprite):
     @classmethod
@@ -59,6 +60,7 @@ class Sprite(pygame.sprite.Sprite):
         self.orientation = orientation
         self.flipped_x = flipped_x
         self.flipped_y = flipped_y
+        self._last_angle = None
         if self.image is not None:
             self.mask = pygame.mask.from_surface(self.image)
             self.surface = self.image.copy()
@@ -83,3 +85,29 @@ class Sprite(pygame.sprite.Sprite):
         self.rect = new_rect
         self.mask = pygame.mask.from_surface(self.image)
         self._last_angle = angle
+        
+    def set_sprite_index(self, index):
+        self.image = self.image_sprites[(self.flipped_x, self.flipped_y, index)]
+        self.surface = self.image.copy()
+        self.rect = self.image.get_rect(center = self.rect.center)
+        self.mask = pygame.mask.from_surface(self.image)
+        self.index = index
+        self.rotate(self.orientation)
+
+
+class layer(enum.IntEnum):
+    
+    background = 0
+    enemy = 20
+    shrub = 25
+    projectile = 30
+
+class Background(Sprite):
+    
+    _layer = layer.background
+
+class Shrub(Sprite):
+    
+    _layer = layer.shrub
+
+

@@ -25,7 +25,8 @@ def load_all_sounds():
 
 SPRITES = {
     "backdrop": "grass_background.png",
-    "road": "FieldsTile_20.png"
+    "road": "FieldsTile_20.png",
+    "game_logo": "game_logo.png",
 }
 
 IMAGE_SPRITES = {}

@@ -3,8 +3,8 @@ from dataclasses import dataclass, field
 from tower.state import GameState, StateError
 from tower.game_loop import GameLoop, GameMenu
 
-width = 1024
-height = 768
+width = 1280
+height = 720
 
 SCREENRECT = pygame.Rect(0, 0, width, height)
 
