@@ -1,10 +1,13 @@
 import pygame
+import random
 from dataclasses import dataclass
 from tower.state import GameState
 from tower.asset_loader import IMAGE_SPRITES
 from tower.sprites import Background, Shrub
 
 DESIRED_FPS = 60
+
+BUSH_INDICES = ["shrub1", "shrub2", "shrub3", "shrub4", "shrub5", "shrub6"]
 
 def create_surface(size, flags = pygame.SRCALPHA):
     return pygame.Surface(size, flags = flags)
@@ -53,19 +56,28 @@ class GameMenu(GameLoop):
             orientation = 0,
             position = self.game.screen_rect.center,
         )
-        bush = Shrub.create_from_tile(
-            groups = [group],
-            index = "shrub",
-            orientation = 0,
-            position = (320, 320),
-        )
+        screen_width, screen_height = self.game.screen_rect.size
+        self.bushes = []
+        for _ in range(15):
+            position = (
+                random.randint(0, screen_width),
+                random.randint(0, screen_height),
+            )
+            bush = Shrub.create_from_tile(
+                groups = [group],
+                index = random.choice(BUSH_INDICES),
+                orientation = 0,
+                position = position,
+            )
+            self.bushes.append(bush)
+
         rotation = 0
         while self.state == GameState.main_menu:
             self.handle_events()
             #repaint background
             self.screen.blit(background, (0, 0))
-            rotation += 1
-            logo.rotate(rotation % 360)
+            #rotation += 1
+            #logo.rotate(rotation % 360)
             # Instruct all sprites to update
             group.update()
             # Tell the group where to draw
