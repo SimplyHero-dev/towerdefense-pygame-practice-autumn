@@ -46,7 +46,7 @@ class GameMenu(GameLoop):
         clock = pygame.time.Clock()
         background = create_surface(self.game.screen_rect.size)
         background.blit(IMAGE_SPRITES[(False, False, "backdrop")], (0, 0))
-        group = pygame.sprite.Group()
+        group = pygame.sprite.LayeredUpdates()
         logo = Background.create_from_tile(
             groups = [group],
             index = "game_logo",
