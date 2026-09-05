@@ -101,6 +101,7 @@ class layer(enum.IntEnum):
     enemy = 20
     shrub = 25
     projectile = 30
+    front = 35
 
 class Background(Sprite):
     
@@ -110,4 +111,6 @@ class Shrub(Sprite):
     
     _layer = layer.shrub
 
+class Logo(Sprite):
 
+    _layer = layer.front

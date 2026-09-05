@@ -33,6 +33,7 @@ SPRITES = {
     "shrub4": "3.png",
     "shrub5": "2.png",
     "shrub6": "1.png",
+    "blank": "blank.png",
 }
 
 IMAGE_SPRITES = {}

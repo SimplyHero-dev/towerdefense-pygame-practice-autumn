@@ -2,11 +2,9 @@ import pygame
 from dataclasses import dataclass, field
 from tower.state import GameState, StateError
 from tower.game_loop import GameLoop, GameMenu
+from tower.grid import TILE_WIDTH, TILE_HEIGHT, TILES_X, TILES_Y
 
-width = 1620
-height = 1080
-
-SCREENRECT = pygame.Rect(0, 0, width, height)
+SCREENRECT = pygame.Rect(0, 0, TILE_WIDTH * TILES_X, TILE_HEIGHT * TILES_Y)
 
 @dataclass
 class TowerGame:

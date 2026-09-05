@@ -3,7 +3,9 @@ import random
 from dataclasses import dataclass
 from tower.state import GameState
 from tower.asset_loader import IMAGE_SPRITES
-from tower.sprites import Background, Shrub
+from tower.sprites import Background, Shrub, Logo
+from tower.grid import create_tile_map, tile_positions
+from tower.sprite_manager import Spritemanager
 
 DESIRED_FPS = 60
 
@@ -45,12 +47,33 @@ class GameLoop:
         return self.game.state
     
 class GameMenu(GameLoop):
+
+    def create_level(self):
+        background_tiles = create_tile_map()
+        for (gy, gx, x, y) in tile_positions():
+            background_tile = Background.create_from_tile(
+                groups = [],
+                index = "blank",
+            )
+            background_tile.rect.topleft = (x, y)
+            background_tiles[gy][gx] = background_tile
+        return background_tiles
+
+    def draw_background(self):
+        self.background.blit(IMAGE_SPRITES[(False, False, "backdrop")], (0, 0))
+        for (gy, gx, x, y) in tile_positions():
+            background_tile = self.level[gy][gx]
+            self.background.blit(background_tile.image, (x, y))
+
     def loop(self):
         clock = pygame.time.Clock()
-        background = create_surface(self.game.screen_rect.size)
-        background.blit(IMAGE_SPRITES[(False, False, "backdrop")], (0, 0))
+        self.background = create_surface(self.game.screen_rect.size)
+
+        self.level = self.create_level()
+        self.draw_background()
+
         group = pygame.sprite.LayeredUpdates()
-        logo = Background.create_from_tile(
+        logo = Logo.create_from_tile(
             groups = [group],
             index = "game_logo",
             orientation = 0,
@@ -71,13 +94,15 @@ class GameMenu(GameLoop):
             )
             self.bushes.append(bush)
 
-        rotation = 0
+
+
+        #*rotation = 0
         while self.state == GameState.main_menu:
             self.handle_events()
             #repaint background
-            self.screen.blit(background, (0, 0))
-            #rotation += 1
-            #logo.rotate(rotation % 360)
+            self.screen.blit(self.background, (0, 0))
+            #*rotation += 1
+            #*logo.rotate(rotation % 360)
             # Instruct all sprites to update
             group.update()
             # Tell the group where to draw
@@ -87,4 +112,30 @@ class GameMenu(GameLoop):
             clock.tick(DESIRED_FPS)
 
 class GameEditing(GameLoop):
-    pass
+    layers: pygame.sprite.LayeredUpdates
+    sprite_manager: Spritemanager
+    level: list
+
+    @property
+    def mouse_position(self):
+        return pygame.mouse.get_pos()
+
+    def handle_events(self, event):
+        if event.type == pygame.MOUSEMOTION:
+            self.sprite_manager.move(self.mouse_position)
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button in (
+            MOUSE_LEFT,
+            MOUSE_RIGHT,
+        ):
+            if event.button == MOUSE_LEFT:
+                self.sprite_manager.place(self.mouse_position)
+            elif event.button == MOUSE_RIGHT:
+                self.sprite_manager.kill()
+
+    def loop(self):
+        while self.state == GameState.map_editing:
+            self.handle_events()
+            self.layers.update()
+            self.layers.draw(self.screen)
+            pygame.display.flip()
+
