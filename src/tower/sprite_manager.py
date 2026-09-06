@@ -54,7 +54,8 @@ class Spritemanager:
             if sprite.layer == layer.background:
                 gx, gy = get_tile_position(sprite.rect.topleft)
                 self.level[gy][gx] = sprite
-            sprite.move(position)
+            else:
+                sprite.move(position)
             self.selected.remove(sprite)
 
     def kill(self):
