@@ -94,15 +94,13 @@ class GameMenu(GameLoop):
             )
             self.bushes.append(bush)
 
-
-
-        #*rotation = 0
+        #!rotation = 0
         while self.state == GameState.main_menu:
             self.handle_events()
             #repaint background
             self.screen.blit(self.background, (0, 0))
-            #*rotation += 1
-            #*logo.rotate(rotation % 360)
+            #!rotation += 1
+            #!logo.rotate(rotation % 360)
             # Instruct all sprites to update
             group.update()
             # Tell the group where to draw
@@ -111,6 +109,13 @@ class GameMenu(GameLoop):
             pygame.display.set_caption(f"FPS {round(clock.get_fps())}")
             clock.tick(DESIRED_FPS)
 
+    def handle_event(self, event):
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_e:
+            self.game.game_editing.level = self.level
+            self.game.game_editing.sprite_manager.level = self.level
+            self.set_state(GameState.map_editing)
+
+@dataclass
 class GameEditing(GameLoop):
     layers: pygame.sprite.LayeredUpdates
     sprite_manager: Spritemanager
@@ -120,21 +125,41 @@ class GameEditing(GameLoop):
     def mouse_position(self):
         return pygame.mouse.get_pos()
 
-    def handle_events(self, event):
+    def handle_event(self, event):
         if event.type == pygame.MOUSEMOTION:
             self.sprite_manager.move(self.mouse_position)
         if event.type == pygame.MOUSEBUTTONDOWN and event.button in (
-            MOUSE_LEFT,
-            MOUSE_RIGHT,
+            pygame.BUTTON_LEFT,
+            pygame.BUTTON_RIGHT,
         ):
-            if event.button == MOUSE_LEFT:
+            if event.button == pygame.BUTTON_LEFT:
                 self.sprite_manager.place(self.mouse_position)
-            elif event.button == MOUSE_RIGHT:
+            elif event.button == pygame.BUTTON_RIGHT:
                 self.sprite_manager.kill()
 
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_1:
+                self.sprite_manager.select_sprites(
+                    self.sprite_manager.create_background(
+                        index = "road",
+                        position = self.mouse_position,
+                    )
+                )
+            elif event.key == pygame.K_2:
+                self.sprite_manager.select_sprites(
+                    self.sprite_manager.create_shrub(
+                        index = random.choice(BUSH_INDICES),
+                        position = self.mouse_position,
+                    )
+                )
+
     def loop(self):
+        background = create_surface(self.game.screen_rect.size)
+        background.blit(IMAGE_SPRITES[(False, False, "backdrop")], (0, 0))
+
         while self.state == GameState.map_editing:
             self.handle_events()
+            self.screen.blit(background, (0, 0))
             self.layers.update()
             self.layers.draw(self.screen)
             pygame.display.flip()

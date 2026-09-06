@@ -1,8 +1,9 @@
 import pygame
 from dataclasses import dataclass, field
 from tower.state import GameState, StateError
-from tower.game_loop import GameLoop, GameMenu
+from tower.game_loop import GameLoop, GameMenu, GameEditing
 from tower.grid import TILE_WIDTH, TILE_HEIGHT, TILES_X, TILES_Y
+from tower.sprite_manager import Spritemanager
 
 SCREENRECT = pygame.Rect(0, 0, TILE_WIDTH * TILES_X, TILE_HEIGHT * TILES_Y)
 
@@ -13,6 +14,7 @@ class TowerGame:
     fullscreen: bool
     state: GameState
     game_menu: GameLoop = field(init=False, default = None)
+    game_editing: GameLoop = field(init=False, default = None)
     
     @classmethod
     def create(cls, fullscreen=False):
@@ -56,7 +58,14 @@ class TowerGame:
 
         self.set_state(GameState.initialized)
         self.game_menu = GameMenu(game = self)
-        self.set_state(GameState.initialized)
+
+        layers = pygame.sprite.LayeredUpdates()
+        self.game_editing = GameEditing(
+            game = self,
+            layers = layers,
+            sprite_manager = Spritemanager.create(layers = layers, level = None),
+            level = None,
+        )
         
     def start_game(self):
         self.assert_state_is(GameState.initialized)
@@ -68,7 +77,7 @@ class TowerGame:
             if self.state == GameState.main_menu:
                 self.game_menu.loop()
             elif self.state == GameState.map_editing:
-                self.game_menu.loop()
+                self.game_editing.loop()
             elif self.state == GameState.game_playing:
                 self.game_menu.loop()
         self.quit()
