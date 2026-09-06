@@ -143,7 +143,8 @@ class GameEditing(GameLoop):
                     self.sprite_manager.create_background(
                         index = "road",
                         position = self.mouse_position,
-                    )
+                    ),
+                    position = self.mouse_position,
                 )
             elif event.key == pygame.K_2:
                 self.sprite_manager.select_sprites(
