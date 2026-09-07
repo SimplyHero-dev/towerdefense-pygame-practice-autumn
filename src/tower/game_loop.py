@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from tower.state import GameState
 from tower.asset_loader import IMAGE_SPRITES
 from tower.sprites import Background, Shrub, Logo
-from tower.grid import create_tile_map, tile_positions
+from tower.grid import create_tile_map, tile_positions, get_tile_position, get_grid_rect
 from tower.sprite_manager import Spritemanager
 
 DESIRED_FPS = 60
@@ -124,7 +124,8 @@ class GameEditing(GameLoop):
     spawn: callable = None
     bush_index: int = 0
     tile_index: int = 0
-
+    placing: str = None
+    
     @property
     def mouse_position(self):
         return pygame.mouse.get_pos()
@@ -146,6 +147,7 @@ class GameEditing(GameLoop):
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_1:
+                self.placing = "tile"
                 self.sprite_manager.kill()
                 self.spawn = lambda: self.sprite_manager.select_sprites(
                     self.sprite_manager.create_background(
@@ -156,6 +158,7 @@ class GameEditing(GameLoop):
                 )
                 self.spawn()
             elif event.key == pygame.K_2:
+                self.placing = "bush"
                 self.sprite_manager.kill()
                 self.spawn = lambda: self.sprite_manager.select_sprites(
                     self.sprite_manager.create_shrub(
@@ -181,5 +184,12 @@ class GameEditing(GameLoop):
             self.screen.blit(background, (0, 0))
             self.layers.update()
             self.layers.draw(self.screen)
+            
+            if self.placing != "bush": #! == "tile":
+                gx, gy = get_tile_position(self.mouse_position)
+                highlight_rect = get_grid_rect(gx, gy)
+                pygame.draw.rect(self.screen, (255, 255, 0), highlight_rect, width = 2)
+                
             pygame.display.flip()
+
 
