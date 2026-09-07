@@ -10,6 +10,7 @@ from tower.sprite_manager import Spritemanager
 DESIRED_FPS = 60
 
 BUSH_INDICES = ["shrub1", "shrub2", "shrub3", "shrub4", "shrub5", "shrub6"]
+TILE_INDICES = ["road1", "road2", "road3", "road4", "road5"]
 
 def create_surface(size, flags = pygame.SRCALPHA):
     return pygame.Surface(size, flags = flags)
@@ -120,6 +121,9 @@ class GameEditing(GameLoop):
     layers: pygame.sprite.LayeredUpdates
     sprite_manager: Spritemanager
     level: list
+    spawn: callable = None
+    bush_index: int = 0
+    tile_index: int = 0
 
     @property
     def mouse_position(self):
@@ -134,25 +138,39 @@ class GameEditing(GameLoop):
         ):
             if event.button == pygame.BUTTON_LEFT:
                 self.sprite_manager.place(self.mouse_position)
+                if self.spawn:
+                    self.spawn()
             elif event.button == pygame.BUTTON_RIGHT:
                 self.sprite_manager.kill()
+                self.spawn = None
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_1:
-                self.sprite_manager.select_sprites(
+                self.sprite_manager.kill()
+                self.spawn = lambda: self.sprite_manager.select_sprites(
                     self.sprite_manager.create_background(
-                        index = "road",
+                        index = TILE_INDICES[self.tile_index],
                         position = self.mouse_position,
                     ),
                     position = self.mouse_position,
                 )
+                self.spawn()
             elif event.key == pygame.K_2:
-                self.sprite_manager.select_sprites(
+                self.sprite_manager.kill()
+                self.spawn = lambda: self.sprite_manager.select_sprites(
                     self.sprite_manager.create_shrub(
-                        index = random.choice(BUSH_INDICES),
+                        index = BUSH_INDICES[self.bush_index],
                         position = self.mouse_position,
-                    )
+                    ),
+                    position = self.mouse_position,
                 )
+                self.spawn()
+            elif event.key == pygame.K_TAB:
+                if self.spawn is not None:
+                    self.bush_index = (self.bush_index + 1) % len(BUSH_INDICES)
+                    self.tile_index = (self.tile_index + 1) % len(TILE_INDICES)
+                    self.sprite_manager.kill()
+                    self.spawn()
 
     def loop(self):
         background = create_surface(self.game.screen_rect.size)
