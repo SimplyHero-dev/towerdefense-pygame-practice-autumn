@@ -185,7 +185,7 @@ class GameEditing(GameLoop):
             self.layers.update()
             self.layers.draw(self.screen)
             
-            if self.placing != "bush": #! == "tile":
+            if self.placing != "bush": #! or do this == "tile":
                 gx, gy = get_tile_position(self.mouse_position)
                 highlight_rect = get_grid_rect(gx, gy)
                 pygame.draw.rect(self.screen, (255, 255, 0), highlight_rect, width = 2)
