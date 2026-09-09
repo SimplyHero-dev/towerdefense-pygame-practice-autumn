@@ -1,8 +1,11 @@
 import pygame
 from dataclasses import dataclass
-from tower.sprites import Background, Shrub
+from tower.sprites import Background, Shrub, Enemy
 from tower.grid import TILE_HEIGHT, TILE_WIDTH, get_tile_position
 from tower.sprites import layer
+from itertools import cycle
+from tower import asset_loader
+from tower.sprites import Enemy, AnimationState
 
 @dataclass
 class Spritemanager:
@@ -34,6 +37,20 @@ class Spritemanager:
             position = position,
         )
         return shrubs
+    
+    def create_enemy(self, position, orientation = None):
+        enemy = Enemy.create_from_surface(
+            #!sounds = None,
+            groups = [self.layers],
+            surface = asset_loader.WALK_FRAMES[0],
+            orientation = orientation,
+            position = position,
+        )
+        enemy.frames = {
+            AnimationState.walking: cycle(asset_loader.WALK_FRAMES),
+        }
+        enemy.animation_state = AnimationState.walking
+        return enemy
 
     def select_sprites(self, sprites, position = None):
         self.selected.add(sprites)

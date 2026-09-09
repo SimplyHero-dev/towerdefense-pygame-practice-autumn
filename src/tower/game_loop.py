@@ -168,6 +168,15 @@ class GameEditing(GameLoop):
                     position = self.mouse_position,
                 )
                 self.spawn()
+            elif event.key == pygame.K_3:
+                self.placing = "enemy"
+                self.sprite_manager.kill()
+                self.spawn = lambda: self.sprite_manager.select_sprites(
+                    self.sprite_manager.create_enemy(
+                        position = self.mouse_position,
+                    ),
+                )
+                self.spawn()
             elif event.key == pygame.K_TAB:
                 if self.spawn is not None:
                     self.bush_index = (self.bush_index + 1) % len(BUSH_INDICES)
@@ -185,7 +194,7 @@ class GameEditing(GameLoop):
             self.layers.update()
             self.layers.draw(self.screen)
             
-            if self.placing != "bush": #! or do this == "tile":
+            if self.placing == "tile":
                 gx, gy = get_tile_position(self.mouse_position)
                 highlight_rect = get_grid_rect(gx, gy)
                 pygame.draw.rect(self.screen, (255, 255, 0), highlight_rect, width = 2)
