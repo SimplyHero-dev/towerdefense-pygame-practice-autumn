@@ -194,6 +194,7 @@ class GameEditing(GameLoop):
                     self.spawn()
 
     def loop(self):
+        clock = pygame.time.Clock()
         background = create_surface(self.game.screen_rect.size)
         background.blit(IMAGE_SPRITES[(False, False, "backdrop")], (0, 0))
 
@@ -209,5 +210,6 @@ class GameEditing(GameLoop):
                 pygame.draw.rect(self.screen, (255, 255, 0), highlight_rect, width = 2)
                 
             pygame.display.flip()
-
+            pygame.display.set_caption(f"FPS {round(clock.get_fps())}")
+            clock.tick(DESIRED_FPS)
 
