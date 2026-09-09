@@ -7,6 +7,7 @@ class AnimationState(enum.Enum):
     walking = "walking"
     dying = "dying"
     exploding = "exploding"
+    idle = "idle"
     
     @classmethod
     def state_kill_sprite(cls, state):
@@ -63,6 +64,7 @@ class Sprite(pygame.sprite.Sprite):
         flipped_y = False,
         animation_state = AnimationState.stopped,
         frames = None,
+        animation_speed = 6
     ):
         super().__init__(groups)
         self.image = image
@@ -75,6 +77,8 @@ class Sprite(pygame.sprite.Sprite):
         self._last_angle = None
         self.animation_state = animation_state
         self.frames = frames
+        self.animation_speed = animation_speed
+        self._animation_tick = 0
         if self.image is not None:
             self.mask = pygame.mask.from_surface(self.image)
             self.surface = self.image.copy()
@@ -112,6 +116,11 @@ class Sprite(pygame.sprite.Sprite):
         if self.frames is not None:
             roll = self.frames.get(self.animation_state, None)
             if roll is not None:
+                self._animation_tick += 1
+                if self._animation_tick < self.animation_speed:
+                    return
+                self._animation_tick = 0
+                
                 try:
                     next_frame_index = next(roll)
                     if next_frame_index != self.index:
@@ -134,6 +143,7 @@ class Sprite(pygame.sprite.Sprite):
 class layer(enum.IntEnum):
     
     background = 0
+    turret = 15
     enemy = 20
     shrub = 25
     projectile = 30
@@ -154,3 +164,7 @@ class Logo(Sprite):
 class Enemy(Sprite):
     
     _layer = layer.enemy
+
+class Turret(Sprite):
+    
+    _layer = layer.turret

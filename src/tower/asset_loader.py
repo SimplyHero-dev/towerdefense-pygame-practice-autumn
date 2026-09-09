@@ -1,6 +1,5 @@
 import pygame
 import importlib.resources
-from itertools import cycle
 
 def load(module_path, name):
     ref = importlib.resources.files(module_path) / name
@@ -66,11 +65,14 @@ def load_all_images():
                 new_img = pygame.transform.flip(img, flip_x = flipped_x, flip_y = flipped_y)
                 IMAGE_SPRITES[(flipped_x, flipped_y, sprite_index)] = new_img
  
-WALK_FRAMES = [] 
+WALK_FRAMES = []
+TOWER_IDLE_FRAMES = []
                 
 def load_all_animations():
     global WALK_FRAMES
+    global TOWER_IDLE_FRAMES
     WALK_FRAMES = import_spritesheet("D_walk.png", frame_width = 48, frame_height = 48)
+    TOWER_IDLE_FRAMES = import_spritesheet("level7toweridle.png", frame_width = 70, frame_height = 130)
 
 
 

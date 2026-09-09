@@ -1,6 +1,6 @@
 import pygame
 from dataclasses import dataclass
-from tower.sprites import Background, Shrub, Enemy
+from tower.sprites import Background, Shrub, Enemy, Turret
 from tower.grid import TILE_HEIGHT, TILE_WIDTH, get_tile_position
 from tower.sprites import layer
 from itertools import cycle
@@ -45,12 +45,28 @@ class Spritemanager:
             surface = asset_loader.WALK_FRAMES[0],
             orientation = orientation,
             position = position,
+            animation_speed = 6,
         )
         enemy.frames = {
             AnimationState.walking: cycle(asset_loader.WALK_FRAMES),
         }
         enemy.animation_state = AnimationState.walking
         return enemy
+
+    def create_turret(self, position, orientation = None):
+        turret = Turret.create_from_surface(
+            #!sounds = None,
+            groups = [self.layers],
+            surface = asset_loader.WALK_FRAMES[0],
+            orientation = orientation,
+            position = position,
+            animation_speed = 6,
+        )
+        turret.frames = {
+            AnimationState.idle:  cycle(asset_loader.TOWER_IDLE_FRAMES),
+        }
+        turret.animation_state = AnimationState.idle
+        return turret
 
     def select_sprites(self, sprites, position = None):
         self.selected.add(sprites)

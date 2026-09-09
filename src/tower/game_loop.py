@@ -177,6 +177,15 @@ class GameEditing(GameLoop):
                     ),
                 )
                 self.spawn()
+            elif event.key == pygame.K_4:
+                self.placing = "turret"
+                self.sprite_manager.kill()
+                self.spawn = lambda: self.sprite_manager.select_sprites(
+                    self.sprite_manager.create_turret(
+                        position = self.mouse_position,
+                    ),
+                )
+                self.spawn()
             elif event.key == pygame.K_TAB:
                 if self.spawn is not None:
                     self.bush_index = (self.bush_index + 1) % len(BUSH_INDICES)
