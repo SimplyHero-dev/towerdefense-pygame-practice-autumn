@@ -67,8 +67,11 @@ class Sprite(pygame.sprite.Sprite):
         flipped_y = False,
         animation_state = AnimationState.stopped,
         frames = None,
-        animation_speed = 6
+        animation_speed = 6,
+        path: iter = None,
+        angle: iter = None,
     ):
+        
         super().__init__(groups)
         self.image = image
         self.image_tiles = image_tiles
@@ -82,6 +85,8 @@ class Sprite(pygame.sprite.Sprite):
         self.frames = frames
         self.animation_speed = animation_speed
         self._animation_tick = 0
+        self.path = path
+        self.angle = angle
         if self.image is not None:
             self.mask = pygame.mask.from_surface(self.image)
             self.surface = self.image.copy()
@@ -138,9 +143,20 @@ class Sprite(pygame.sprite.Sprite):
         self.surface = surface.copy()
         self.rect = surface.get_rect(center = self.rect.center)
         self.mask = pygame.mask.from_surface(self.image)
+
+    def generate_rotation(self):
+        return None
     
     def update(self):
         self.animate()
+
+        if self.path is not None:
+            pos, path_angle = next(self.path)
+            self.move(pos)
+            angle = 0
+            if self.angle is not None:
+                angle = next(self.angle)
+            self.rotate(path_angle + angle)
 
 
 class layer(enum.IntEnum):
