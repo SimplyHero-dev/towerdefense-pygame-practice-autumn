@@ -1,6 +1,9 @@
 import pygame
-from tower.asset_loader import IMAGE_SPRITES
 import enum
+from tower.asset_loader import IMAGE_SPRITES
+from itertools import cycle, chain
+from pygame.math import Vector2 as Vector
+
 
 class AnimationState(enum.Enum):
     stopped = "stopped"
@@ -147,6 +150,7 @@ class layer(enum.IntEnum):
     enemy = 20
     shrub = 25
     projectile = 30
+    turret_sights = 35
     front = 35
 
 class Background(Sprite):
@@ -168,3 +172,61 @@ class Enemy(Sprite):
 class Turret(Sprite):
     
     _layer = layer.turret
+
+
+def extend(iterable, repeat):
+    return (elem for elem in iterable for _ in range(repeat))
+
+def create_turret_sweep(orientation, sweep_degrees, speed = 3):
+    half_sweep = sweep_degrees // 2
+    return cycle(
+        extend(
+            chain(
+                range(orientation - half_sweep, orientation + half_sweep),
+                reversed(range(orientation - half_sweep, orientation + half_sweep)),
+            ),
+            speed,
+        ),
+    )
+
+class Vision(Sprite):
+    
+    _layer = layer.turret_sights
+    
+    @classmethod
+    def create_vision(cls, rect, **kwargs):
+        surface = create_surface(size = rect.size)
+        surface.fill((0, 0, 128, 128))
+        surface.set_colorkey((0, 128, 128), rect, width = 2)
+        pygame.draw.rect(surface, (0, 128, 128), rect, width = 2)
+        return cls.create_from_surface(surface = surface, **kwargs)
+    
+    def __init__(self, turret, **kwargs):
+        self.turret = turret
+        super().__init__(**kwargs)
+        self.set_orientation(self.orientation)
+        
+    def generate_rotation(self):
+        return create_turret_sweep(self.orientation, sweep_degrees = 60)
+    
+    def set_orientation(self, orientation):
+        self.orientation = orientation
+        self.angle = self.generate_rotation()
+        self.rotate(next(self.angle))
+        
+    def rotate(self, angle):
+        new_image = pygame.transform.rotate(self.surface, new_angle)
+        turret = self.turret
+        v = Vector(
+            0,
+            (self.surface.get_rect().height // 2 + turret.surface.get_rect().top),
+        )
+        rv = v.rotate(-new_angle)
+        new_rect = new_image.get_rect(center = turret.rect.center + rv)
+        self.image = new_image
+        self.rect = new_rect
+        self.mask = pygame.mask.from_surface(self.image)
+        
+    def update(self):
+        self.rotate(next(self.angle))
+        
