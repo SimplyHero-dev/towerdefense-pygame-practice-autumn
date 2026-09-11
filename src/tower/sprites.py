@@ -1,6 +1,5 @@
 import pygame
 import enum
-from tower import asset_loader
 from tower.asset_loader import IMAGE_SPRITES
 from itertools import cycle, chain
 from pygame.math import Vector2 as Vector
