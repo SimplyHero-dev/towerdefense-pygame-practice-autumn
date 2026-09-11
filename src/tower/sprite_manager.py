@@ -1,6 +1,6 @@
 import pygame
 from dataclasses import dataclass
-from tower.sprites import Background, Shrub, Enemy, Turret
+from tower.sprites import Background, Shrub, Enemy, Turret, Portal
 from tower.grid import TILE_HEIGHT, TILE_WIDTH, get_tile_position
 from tower.sprites import layer
 from itertools import cycle
@@ -57,7 +57,7 @@ class Spritemanager:
         turret = Turret.create_from_surface(
             #!sounds = None,
             groups = [self.layers],
-            surface = asset_loader.WALK_FRAMES[0],
+            surface = asset_loader.TOWER_IDLE_FRAMES[0],
             orientation = orientation,
             position = position,
             animation_speed = 6,
@@ -68,6 +68,21 @@ class Spritemanager:
         turret.animation_state = AnimationState.idle
         return turret
 
+    def create_portal(self, position, orientation = None):
+        portal = Portal.create_from_surface(
+            #!sounds = None,
+            groups = [self.layers],
+            surface = asset_loader.PORTAL_IDLE_FRAMES[0],
+            orientation = orientation,
+            position = position,
+            animation_speed = 6,
+        )
+        portal.frames = {
+            AnimationState.idle:  cycle(asset_loader.PORTAL_IDLE_FRAMES),
+        }
+        portal.animation_state = AnimationState.idle
+        return portal
+    
     def select_sprites(self, sprites, position = None):
         self.selected.add(sprites)
         if position is not None:

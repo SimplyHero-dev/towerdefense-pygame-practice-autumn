@@ -189,6 +189,9 @@ class Turret(Sprite):
     
     _layer = layer.turret
 
+class Portal(Sprite):
+    
+    _layer = layer.turret
 
 def extend(iterable, repeat):
     return (elem for elem in iterable for _ in range(repeat))

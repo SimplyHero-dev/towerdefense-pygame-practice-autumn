@@ -186,6 +186,15 @@ class GameEditing(GameLoop):
                     ),
                 )
                 self.spawn()
+            elif event.key == pygame.K_5:
+                self.placing = "portal"
+                self.sprite_manager.kill()
+                self.spawn = lambda: self.sprite_manager.select_sprites(
+                    self.sprite_manager.create_portal(
+                        position = self.mouse_position,
+                    ),
+                )
+                self.spawn()
             elif event.key == pygame.K_TAB:
                 if self.spawn is not None:
                     self.bush_index = (self.bush_index + 1) % len(BUSH_INDICES)
