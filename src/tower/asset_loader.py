@@ -66,16 +66,18 @@ def load_all_images():
                 IMAGE_SPRITES[(flipped_x, flipped_y, sprite_index)] = new_img
  
 WALK_FRAMES = []
+WALK_FRAMES_FLIPPED = []
 TOWER_IDLE_FRAMES = []
 PORTAL_IDLE_FRAMES = []
                 
 def load_all_animations():
     global WALK_FRAMES
+    global WALK_FRAMES_FLIPPED
     global TOWER_IDLE_FRAMES
     global PORTAL_IDLE_FRAMES
     WALK_FRAMES = import_spritesheet("D_walk.png", frame_width = 48, frame_height = 48)
+    WALK_FRAMES_FLIPPED = [pygame.transform.flip(frame, True, False) for frame in WALK_FRAMES]
     TOWER_IDLE_FRAMES = import_spritesheet("level7toweridle.png", frame_width = 70, frame_height = 130)
     PORTAL_IDLE_FRAMES = import_spritesheet("PORTAL BLUE-Sheet.png", frame_width = 64, frame_height = 64)
-
 
 

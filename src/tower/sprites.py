@@ -1,5 +1,6 @@
 import pygame
 import enum
+from tower import asset_loader
 from tower.asset_loader import IMAGE_SPRITES
 from itertools import cycle, chain
 from pygame.math import Vector2 as Vector
@@ -70,6 +71,8 @@ class Sprite(pygame.sprite.Sprite):
         animation_speed = 6,
         path: iter = None,
         angle: iter = None,
+        frame_source: list = None,
+        frame_source_flipped: list = None,
     ):
         
         super().__init__(groups)
@@ -87,6 +90,9 @@ class Sprite(pygame.sprite.Sprite):
         self._animation_tick = 0
         self.path = path
         self.angle = angle
+        self.sprite_offset = Vector(0, 0)
+        self.frame_source = frame_source
+        self.frame_source_flipped = frame_source_flipped
         if self.image is not None:
             self.mask = pygame.mask.from_surface(self.image)
             self.surface = self.image.copy()
@@ -130,15 +136,21 @@ class Sprite(pygame.sprite.Sprite):
                 self._animation_tick = 0
                 
                 try:
-                    next_frame_index = next(roll)
-                    if next_frame_index != self.index:
-                        self.set_frame(next_frame_index)
+                    next_index = next(roll)
+                    if next_index != self.index:
+                        self_index = next_index
+                        self.set_frame_by_index(next_index)
                 except StopIteration:
                     if AnimationState.state_kill_sprite(self.animation_state):
                         self.kill()
                     self.animation_state = AnimationState.stopped
     
-    def set_frame(self, surface):
+    def set_frame_by_index(self, index):
+        if self.flipped_x and self.frame_source_flipped is not None:
+            frames = self.frame_source_flipped
+        else:
+            frames = self.frame_source
+        surface = frames[index]
         self.image = surface
         self.surface = surface.copy()
         self.rect = surface.get_rect(center = self.rect.center)
@@ -184,6 +196,25 @@ class Logo(Sprite):
 class Enemy(Sprite):
     
     _layer = layer.enemy
+    
+    def update(self):
+        try:
+            self.animate()
+            if self.path is not None:
+                position, _, flipx = next(self.path)
+                if flipx != self.flipped_x:
+                    self.flipped_x = flipx
+                    centroid = self.mask.centroid()
+                    self.set_frame_by_index(self.index)
+                    new_centroid = self.mask.centroid()
+                    self.sprite_offset = Vector(new_centroid) - Vector(centroid)
+                if flipx:
+                    self.move(position - self.sprite_offset)
+                else:
+                    self.move(position)
+            self.play()
+        except StopIteration:
+            self.state = AnimationState.stopped
 
 class Turret(Sprite):
     

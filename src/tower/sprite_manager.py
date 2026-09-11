@@ -6,6 +6,7 @@ from tower.sprites import layer
 from itertools import cycle
 from tower import asset_loader
 from tower.sprites import Enemy, AnimationState
+from tower.grid import make_enemy_path
 
 @dataclass
 class Spritemanager:
@@ -38,7 +39,7 @@ class Spritemanager:
         )
         return shrubs
     
-    def create_enemy(self, position, orientation = None):
+    def create_enemy(self, position, start_tile, stop_positions, orientation = None):
         enemy = Enemy.create_from_surface(
             #!sounds = None,
             groups = [self.layers],
@@ -47,10 +48,13 @@ class Spritemanager:
             position = position,
             animation_speed = 6,
         )
+        enemy.frame_source = asset_loader.WALK_FRAMES
+        enemy.frame_source_flipped = asset_loader.WALK_FRAMES_FLIPPED
         enemy.frames = {
-            AnimationState.walking: cycle(asset_loader.WALK_FRAMES),
+            AnimationState.walking: cycle(range(len(asset_loader.WALK_FRAMES))),
         }
         enemy.animation_state = AnimationState.walking
+        enemy.path = make_enemy_path(start_tile, stop_positions)
         return enemy
 
     def create_turret(self, position, orientation = None):
@@ -62,8 +66,10 @@ class Spritemanager:
             position = position,
             animation_speed = 6,
         )
+        turret.frame_source = asset_loader.TOWER_IDLE_FRAMES
+        turret.frame_source_flipped = None
         turret.frames = {
-            AnimationState.idle:  cycle(asset_loader.TOWER_IDLE_FRAMES),
+            AnimationState.idle:  cycle(range(len(asset_loader.TOWER_IDLE_FRAMES))),
         }
         turret.animation_state = AnimationState.idle
         return turret
@@ -77,8 +83,10 @@ class Spritemanager:
             position = position,
             animation_speed = 6,
         )
+        portal.frame_source = asset_loader.PORTAL_IDLE_FRAMES
+        portal.frame_source_flipped = None
         portal.frames = {
-            AnimationState.idle:  cycle(asset_loader.PORTAL_IDLE_FRAMES),
+            AnimationState.idle:  cycle(range(len(asset_loader.PORTAL_IDLE_FRAMES))),
         }
         portal.animation_state = AnimationState.idle
         return portal
