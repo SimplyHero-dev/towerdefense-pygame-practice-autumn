@@ -24,3 +24,4 @@ def create_project_path(start, stop, speed, max_distance):
 
 def path_with_no_rotation(position_iterable):
     return ((pos, 0) for pos in position_iterable)
+

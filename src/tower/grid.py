@@ -1,6 +1,10 @@
 import pygame
+import random
 from dataclasses import dataclass, field
 from typing import Tuple, Optional
+from pygame.math import Vector2 as Vector
+from itertools import pairwise, chain
+from tower.movement import interpolate
 
 TILE_HEIGHT = 32
 TILE_WIDTH = 32
@@ -8,8 +12,9 @@ TILE_WIDTH = 32
 TILES_Y = 33
 TILES_X = 50
 
-START_TILE_ID = ""
-STOP_TILE_ID = ""
+START_TILE_ID = "portal"
+STOP_TILE_ID = "portal"
+MOVABLE_TILE_IDS = "road1", "road2", "road3", "road4", "road5",
 
 def get_grid_rect(gx, gy):
 
@@ -68,3 +73,80 @@ def walk_grid(tile_map, visited, gx, gy, valid_tile_indices):
         tile.north = walk_grid(tile_map, visited, gx, gy - 1, valid_tile_indices)
         tile.south = walk_grid(tile_map, visited, gx, gy + 1, valid_tile_indices)
         
+def update_path_finding(tile_map):
+    start_position, stop_position = get_portals(tile_map, START_TILE_ID, STOP_TILE_ID)
+    paths = []
+    while start_position:
+        visited = {}
+        gx, gy = start_position.pop()
+        start_tile = walk_grid(tile_map, visited, gx, gy, MOVABLE_TILE_IDS)
+        
+        for stop_position in stop_position:
+            try:
+                paths.append((start_tile, visited[stop_position]))
+            except KeyError:
+                pass
+    return paths
+
+def dfs_find_path(start_tile: GridTile, stop_positions):
+    # keep track of visited grid tiles
+    visited = {}
+    
+    def _walk(
+        path: list,
+        current_tile: Optional[GridTile],
+    ):
+        if current_tile is None or current_tile.position in visited:
+            return []
+        visited[current_tile.position] = current_tile
+        if current_tile.position in stop_positions:
+            return path + [current_tile]
+        directions = [
+            current_tile.east,
+            current_tile.west,
+            current_tile.north,
+            current_tile.south,
+        ]
+        random.shuffle(directions)
+        for direction in directions:
+            subpath = _walk(path + [current_tile], direction)
+            if subpath:
+                return subpath
+        return []
+    
+    return _walk([], start_tile)
+
+def get_directions(start_tile: GridTile, stop_positions):
+    try:
+        vectors = []
+        for a, b, in pairwise(dfs_find_path(start_tile, stop_positions)):
+            v2 = Vector(b.tile.rect.center)
+            v1 = Vector(a.tile.rect.center)
+            vectors.append(
+                (
+                    v1,
+                    v2,
+                )
+            )
+    except StopIteration:
+        pass
+    return vectors
+
+
+def make_enemy_path(start_tile, stop_position, jitter = 10, speed = 40, turn_speed = 8):
+    jitter = random.randint(-jitter, jitter)
+    jv = Vector(jitter, -30 + jitter)
+    for v1, v2 in pairwise(
+        chain.from_iterable(
+            interpolate(t, speed) for t in get_directions(start_tile, stop_position)
+        )
+    ):
+        if v1 == v2:
+            continue
+        dot = v1.normalize().dot((v2 - v1).normalize())
+        flipx = dot < 0
+        yield(
+            v2 + jv,
+            0,
+            flipx,
+        )
