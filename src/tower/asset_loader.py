@@ -53,6 +53,8 @@ SPRITES = {
     "shrub5": "2.png",
     "shrub6": "1.png",
     "blank": "blank.png",
+    "portal_start": "start.png",
+    "portal_stop": "stop.png",
 }
 
 IMAGE_SPRITES = {}

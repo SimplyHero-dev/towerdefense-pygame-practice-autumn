@@ -211,7 +211,7 @@ class Enemy(Sprite):
                     self.move(position - self.sprite_offset)
                 else:
                     self.move(position)
-            self.play()
+            #!self.play()
         except StopIteration:
             self.state = AnimationState.stopped
 

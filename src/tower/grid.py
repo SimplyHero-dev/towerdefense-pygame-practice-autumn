@@ -12,9 +12,9 @@ TILE_WIDTH = 32
 TILES_Y = 33
 TILES_X = 50
 
-START_TILE_ID = "portal"
-STOP_TILE_ID = "portal"
-MOVABLE_TILE_IDS = "road1", "road2", "road3", "road4", "road5",
+START_TILE_ID = "portal_start"
+STOP_TILE_ID = "portal_stop"
+MOVABLE_TILE_IDS = "road1", "road2", "road3", "road4", "road5"
 
 def get_grid_rect(gx, gy):
 
@@ -61,6 +61,7 @@ def walk_grid(tile_map, visited, gx, gy, valid_tile_indices):
         return None
     if tile := visited.get((gx, gy)):
         return tile
+    tile = tile_map[gy][gx]
     if tile.index in valid_tile_indices or tile.index in (
         STOP_TILE_ID,
         START_TILE_ID,
@@ -72,6 +73,8 @@ def walk_grid(tile_map, visited, gx, gy, valid_tile_indices):
         tile.west = walk_grid(tile_map, visited, gx - 1, gy, valid_tile_indices)
         tile.north = walk_grid(tile_map, visited, gx, gy - 1, valid_tile_indices)
         tile.south = walk_grid(tile_map, visited, gx, gy + 1, valid_tile_indices)
+        return tile
+    return None
         
 def update_path_finding(tile_map):
     start_position, stop_position = get_portals(tile_map, START_TILE_ID, STOP_TILE_ID)

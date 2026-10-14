@@ -125,6 +125,8 @@ class GameEditing(GameLoop):
     bush_index: int = 0
     tile_index: int = 0
     placing: str = None
+    start_tile: object = None
+    stop_positions: object = None
     
     @property
     def mouse_position(self):
@@ -174,7 +176,10 @@ class GameEditing(GameLoop):
                 self.spawn = lambda: self.sprite_manager.select_sprites(
                     self.sprite_manager.create_enemy(
                         position = self.mouse_position,
+                        start_tile = self.start_tile,
+                        stop_positions = self.stop_positions,
                     ),
+                    position = self.mouse_position
                 )
                 self.spawn()
             elif event.key == pygame.K_4:
@@ -195,6 +200,41 @@ class GameEditing(GameLoop):
                     ),
                 )
                 self.spawn()
+            elif event.key == pygame.K_6:
+                self.placing = "tile"
+                self.sprite_manager.kill()
+                self.spawn = lambda: self.sprite_manager.select_sprites(
+                    self.sprite_manager.create_background(
+                        index = "portal_start",
+                        position = self.mouse_position,
+                 ),
+                    position = self.mouse_position,
+                )
+                self.spawn()
+            elif event.key == pygame.K_7:
+                self.placing = "tile"
+                self.sprite_manager.kill()
+                self.spawn = lambda: self.sprite_manager.select_sprites(
+                    self.sprite_manager.create_background(
+                        index = "portal_stop",
+                        position = self.mouse_position,
+                 ),
+                    position = self.mouse_position,
+                )
+                self.spawn()
+            elif event.key == pygame.K_p:
+                from tower.grid import get_portals, walk_grid, MOVABLE_TILE_IDS
+                from tower.grid import START_TILE_ID, STOP_TILE_ID
+                
+                start_positions, stop_positions = get_portals(self.level, START_TILE_ID, STOP_TILE_ID)
+                gx, gy = next(iter(start_positions))
+                print("start cell:", (gx, gy), "index:", self.level[gy][gx].index)
+                print("START_TILE_ID:", START_TILE_ID, "STOP_TILE_ID:", STOP_TILE_ID)
+                print("MOVABLE_TILE_IDS:", MOVABLE_TILE_IDS)
+                visited = {}
+                self.start_tile = walk_grid(self.level, visited, gx, gy, MOVABLE_TILE_IDS)
+                self.stop_positions = stop_positions
+                print("Path graph computed:", self.start_tile, self.stop_positions)
             elif event.key == pygame.K_TAB:
                 if self.spawn is not None:
                     self.bush_index = (self.bush_index + 1) % len(BUSH_INDICES)
