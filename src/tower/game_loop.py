@@ -3,8 +3,8 @@ import random
 from dataclasses import dataclass
 from tower.state import GameState
 from tower.asset_loader import IMAGE_SPRITES
-from tower.sprites import Background, Shrub, Logo
-from tower.grid import create_tile_map, tile_positions, get_tile_position, get_grid_rect
+from tower.sprites import Background, Shrub, Logo, AnimationState, layer
+from tower.grid import create_tile_map, tile_positions, get_tile_position, get_grid_rect, collide_mask
 from tower.sprite_manager import Spritemanager
 
 DESIRED_FPS = 60
@@ -172,7 +172,6 @@ class GameEditing(GameLoop):
                 self.spawn()
             elif event.key == pygame.K_3:
                 self.placing = "enemy"
-                self.sprite_manager.kill()
                 self.spawn = lambda: self.sprite_manager.select_sprites(
                     self.sprite_manager.create_enemy(
                         position = self.mouse_position,
@@ -247,11 +246,12 @@ class GameEditing(GameLoop):
         background = create_surface(self.game.screen_rect.size)
         background.blit(IMAGE_SPRITES[(False, False, "backdrop")], (0, 0))
 
-        while self.state == GameState.map_editing:
+        while self.state in (GameState.map_editing, GameState.game_playing):
             self.handle_events()
             self.screen.blit(background, (0, 0))
             self.layers.update()
             self.layers.draw(self.screen)
+            self.handle_collision()
             
             if self.placing == "tile":
                 gx, gy = get_tile_position(self.mouse_position)
@@ -262,3 +262,22 @@ class GameEditing(GameLoop):
             pygame.display.set_caption(f"FPS {round(clock.get_fps())}")
             clock.tick(DESIRED_FPS)
 
+    def handle_collision(self):
+        enemies = self.layers.get_sprites_from_layer(layer.enemy)
+        turret_sights = self.layer.get_sprites_from_layer(layer.turret_sights)
+        projectiles = self.layers.get_sprites_from_layer(layer.projectile)
+        for enemy, turret_sights in collide_mask(enemies, turret_sights):
+            for turret_sight in turret_sights:
+                turret = turret_sight.turret
+                if turret.shoot():
+                    self.sprite_manager.create_projectile(
+                        turret,
+                        enemy,
+                    )
+        
+        for enemy, projectiles in collide_mask(enemies, projectiles):
+            if enemy.animation_state == AnimationState.dying:
+                continue
+            enemy.animation_state = AnimationState.dying
+            for projectile in projectiles:
+                projectile.animation_state = AnimationState.exploding

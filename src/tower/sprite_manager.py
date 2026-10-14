@@ -74,6 +74,13 @@ class Spritemanager:
         }
         turret.animation_state = AnimationState.idle
         return turret
+    
+    def create_projectile(self, position, orientation = None):
+        projectile = Projectile.create_from_surface(
+            groups = [self.layers],
+            surface = asset_loader,
+        )
+        return projectile
 
     def create_portal(self, position, orientation = None):
         portal = Portal.create_from_surface(

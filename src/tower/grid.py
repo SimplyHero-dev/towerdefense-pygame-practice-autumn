@@ -161,3 +161,13 @@ def make_enemy_path(start_tile, stop_position, jitter = 3, offset = Vector(0, -8
             flipx,
             direction
         )
+
+def collide_mask(group_a, group_b):
+    for sprite_a, sprite_b in pygame.sprite.groupcollide(
+        group_a,
+        group_b,
+        False,
+        False,
+        collided = pygame.sprite.collide_mask,
+    ).items():
+        yield sprite_a, sprite_b

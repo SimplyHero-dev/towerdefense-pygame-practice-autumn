@@ -228,6 +228,7 @@ class Enemy(Sprite):
             #!self.play()
         except StopIteration:
             self.animation_state = AnimationState.stopped
+            self.kill()
 
 class Turret(Sprite):
     
