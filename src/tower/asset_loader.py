@@ -75,10 +75,14 @@ PORTAL_IDLE_FRAMES = []
 def load_all_animations():
     global WALK_FRAMES
     global WALK_FRAMES_FLIPPED
+    global WALK_UP_FRAMES
+    global WALK_DOWN_FRAMES
     global TOWER_IDLE_FRAMES
     global PORTAL_IDLE_FRAMES
-    WALK_FRAMES = import_spritesheet("D_walk.png", frame_width = 48, frame_height = 48)
-    WALK_FRAMES_FLIPPED = [pygame.transform.flip(frame, True, False) for frame in WALK_FRAMES]
+    WALK_FRAMES_FLIPPED = import_spritesheet("S_walk.png", frame_width = 48, frame_height = 48)
+    WALK_FRAMES = [pygame.transform.flip(frame, True, False) for frame in WALK_FRAMES_FLIPPED]
+    WALK_UP_FRAMES = import_spritesheet("U_walk.png", frame_width = 48, frame_height = 48)
+    WALK_DOWN_FRAMES = import_spritesheet("D_walk.png", frame_width = 48, frame_height = 48)
     TOWER_IDLE_FRAMES = import_spritesheet("level7toweridle.png", frame_width = 70, frame_height = 130)
     PORTAL_IDLE_FRAMES = import_spritesheet("PORTAL BLUE-Sheet.png", frame_width = 64, frame_height = 64)
 

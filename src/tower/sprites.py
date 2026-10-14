@@ -4,7 +4,6 @@ from tower.asset_loader import IMAGE_SPRITES
 from itertools import cycle, chain
 from pygame.math import Vector2 as Vector
 
-
 class AnimationState(enum.Enum):
     stopped = "stopped"
     walking = "walking"
@@ -72,6 +71,7 @@ class Sprite(pygame.sprite.Sprite):
         angle: iter = None,
         frame_source: list = None,
         frame_source_flipped: list = None,
+        sprite_offset = (0, 0),
     ):
         
         super().__init__(groups)
@@ -92,6 +92,7 @@ class Sprite(pygame.sprite.Sprite):
         self.sprite_offset = Vector(0, 0)
         self.frame_source = frame_source
         self.frame_source_flipped = frame_source_flipped
+        self.sprite_offset = sprite_offset
         if self.image is not None:
             self.mask = pygame.mask.from_surface(self.image)
             self.surface = self.image.copy()
@@ -137,7 +138,7 @@ class Sprite(pygame.sprite.Sprite):
                 try:
                     next_index = next(roll)
                     if next_index != self.index:
-                        self_index = next_index
+                        self.index = next_index
                         self.set_frame_by_index(next_index)
                 except StopIteration:
                     if AnimationState.state_kill_sprite(self.animation_state):
@@ -213,7 +214,7 @@ class Enemy(Sprite):
                     self.move(position)
             #!self.play()
         except StopIteration:
-            self.state = AnimationState.stopped
+            self.animation_state = AnimationState.stopped
 
 class Turret(Sprite):
     
@@ -244,9 +245,11 @@ class Vision(Sprite):
     
     @classmethod
     def create_vision(cls, rect, **kwargs):
+        from tower.game_loop import create_surface
+
         surface = create_surface(size = rect.size)
         surface.fill((0, 0, 128, 128))
-        surface.set_colorkey((0, 128, 128), rect, width = 2)
+        surface.set_colorkey((0, 128, 128))    
         pygame.draw.rect(surface, (0, 128, 128), rect, width = 2)
         return cls.create_from_surface(surface = surface, **kwargs)
     
@@ -263,7 +266,7 @@ class Vision(Sprite):
         self.angle = self.generate_rotation()
         self.rotate(next(self.angle))
         
-    def rotate(self, angle):
+    def rotate(self, new_angle):
         new_image = pygame.transform.rotate(self.surface, new_angle)
         turret = self.turret
         v = Vector(

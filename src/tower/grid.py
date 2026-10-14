@@ -136,9 +136,9 @@ def get_directions(start_tile: GridTile, stop_positions):
     return vectors
 
 
-def make_enemy_path(start_tile, stop_position, jitter = 10, speed = 40, turn_speed = 8):
+def make_enemy_path(start_tile, stop_position, jitter = 3, offset = Vector(0, -8), speed = 40, turn_speed = 8):
     jitter = random.randint(-jitter, jitter)
-    jv = Vector(jitter, -30 + jitter)
+    jv = Vector(jitter, jitter) + offset
     for v1, v2 in pairwise(
         chain.from_iterable(
             interpolate(t, speed) for t in get_directions(start_tile, stop_position)
