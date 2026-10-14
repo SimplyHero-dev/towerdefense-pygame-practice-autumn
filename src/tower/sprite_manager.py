@@ -48,11 +48,12 @@ class Spritemanager:
             position = position,
             animation_speed = 6,
         )
-        enemy.frame_source = asset_loader.WALK_FRAMES
-        enemy.frame_source_flipped = asset_loader.WALK_FRAMES_FLIPPED
-        enemy.frames = {
-            AnimationState.walking: cycle(range(len(asset_loader.WALK_FRAMES))),
+        enemy.direction_frames = {
+            "side": (asset_loader.WALK_FRAMES, asset_loader.WALK_FRAMES_FLIPPED),
+            "up": (asset_loader.WALK_UP_FRAMES, None),
+            "down": (asset_loader.WALK_DOWN_FRAMES, None),
         }
+        enemy.set_direction("side")
         enemy.animation_state = AnimationState.walking
         enemy.path = make_enemy_path(start_tile, stop_positions)
         return enemy

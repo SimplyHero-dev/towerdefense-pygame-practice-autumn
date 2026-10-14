@@ -139,6 +139,7 @@ def get_directions(start_tile: GridTile, stop_positions):
 def make_enemy_path(start_tile, stop_position, jitter = 3, offset = Vector(0, -8), speed = 40, turn_speed = 8):
     jitter = random.randint(-jitter, jitter)
     jv = Vector(jitter, jitter) + offset
+    flipx = False
     for v1, v2 in pairwise(
         chain.from_iterable(
             interpolate(t, speed) for t in get_directions(start_tile, stop_position)
@@ -146,10 +147,17 @@ def make_enemy_path(start_tile, stop_position, jitter = 3, offset = Vector(0, -8
     ):
         if v1 == v2:
             continue
-        dot = v1.normalize().dot((v2 - v1).normalize())
-        flipx = dot < 0
+        dx = v2.x - v1.x
+        dy = v2.y - v1.y
+        if abs(dx) >= abs(dy):
+            direction = "side"
+            if abs(dx) > 0.01:
+                flipx = dx < 0
+        else:
+            direction = "up" if dy < 0 else "down"
         yield(
             v2 + jv,
             0,
             flipx,
+            direction
         )

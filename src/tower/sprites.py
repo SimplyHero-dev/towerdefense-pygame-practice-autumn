@@ -196,12 +196,25 @@ class Logo(Sprite):
 class Enemy(Sprite):
     
     _layer = layer.enemy
+    direction = None
+    direction_frame = None
+    
+    def set_direction(self, direction):
+        self.direction = direction
+        normal, flipped = self.direction_frames[direction]
+        self.frame_source = normal
+        self.frame_source_flipped = flipped
+        self.frames = {AnimationState.walking: cycle(range(len(normal)))}
+        self.index = 0
+        self.set_frame_by_index(0)
     
     def update(self):
         try:
             self.animate()
             if self.path is not None:
-                position, _, flipx = next(self.path)
+                position, _, flipx, direction = next(self.path)
+                if direction != self.direction:
+                    self.set_direction(direction)
                 if flipx != self.flipped_x:
                     self.flipped_x = flipx
                     centroid = self.mask.centroid()

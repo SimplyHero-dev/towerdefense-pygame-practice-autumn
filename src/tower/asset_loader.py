@@ -71,6 +71,8 @@ WALK_FRAMES = []
 WALK_FRAMES_FLIPPED = []
 TOWER_IDLE_FRAMES = []
 PORTAL_IDLE_FRAMES = []
+WALK_UP_FRAMES = []
+WALK_DOWN_FRAMES = []
                 
 def load_all_animations():
     global WALK_FRAMES
