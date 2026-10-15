@@ -73,19 +73,28 @@ TOWER_IDLE_FRAMES = []
 PORTAL_IDLE_FRAMES = []
 WALK_UP_FRAMES = []
 WALK_DOWN_FRAMES = []
+DEATH_FRAMES = []
+DEATH_FRAMES_FLIPPED = []
+DEATH_UP_FRAMES = []
+DEATH_UP_FRAMES = []
+EXPLOSION_FRAMES = []
                 
 def load_all_animations():
-    global WALK_FRAMES
-    global WALK_FRAMES_FLIPPED
-    global WALK_UP_FRAMES
-    global WALK_DOWN_FRAMES
-    global TOWER_IDLE_FRAMES
-    global PORTAL_IDLE_FRAMES
-    WALK_FRAMES_FLIPPED = import_spritesheet("S_walk.png", frame_width = 48, frame_height = 48)
+    global WALK_FRAMES, WALK_FRAMES_FLIPPED, WALK_UP_FRAMES, WALK_DOWN_FRAMES
+    global TOWER_IDLE_FRAMES, PORTAL_IDLE_FRAMES
+    global DEATH_FRAMES, DEATH_FRAMES_FLIPPED, DEATH_UP_FRAMES, DEATH_DOWN_FRAMES, EXPLOSION_FRAMES
+    #enemy
+    WALK_FRAMES_FLIPPED = import_spritesheet("S_Walk.png", frame_width = 48, frame_height = 48)
     WALK_FRAMES = [pygame.transform.flip(frame, True, False) for frame in WALK_FRAMES_FLIPPED]
-    WALK_UP_FRAMES = import_spritesheet("U_walk.png", frame_width = 48, frame_height = 48)
-    WALK_DOWN_FRAMES = import_spritesheet("D_walk.png", frame_width = 48, frame_height = 48)
+    WALK_UP_FRAMES = import_spritesheet("U_Walk.png", frame_width = 48, frame_height = 48)
+    WALK_DOWN_FRAMES = import_spritesheet("D_Walk.png", frame_width = 48, frame_height = 48)
+    DEATH_FRAMES_FLIPPED = import_spritesheet("S_Death.png", frame_width = 48, frame_height = 48)
+    DEATH_FRAMES = [pygame.transform.flip(frame, True, False) for frame in DEATH_FRAMES_FLIPPED]
+    DEATH_UP_FRAMES = import_spritesheet("U_Death.png", frame_width = 48, frame_height = 48)
+    DEATH_DOWN_FRAMES = import_spritesheet("D_Death.png", frame_width = 48, frame_height = 48)
+    #nonliving
     TOWER_IDLE_FRAMES = import_spritesheet("level7toweridle.png", frame_width = 70, frame_height = 130)
     PORTAL_IDLE_FRAMES = import_spritesheet("PORTAL BLUE-Sheet.png", frame_width = 64, frame_height = 64)
+    EXPLOSION_FRAMES = import_spritesheet("PORTAL BLUE-Sheet.png", frame_width = 64, frame_height = 64)
 
 

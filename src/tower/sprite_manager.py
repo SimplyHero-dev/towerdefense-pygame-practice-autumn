@@ -1,12 +1,15 @@
 import pygame
+from pygame.math import Vector2 as Vector
 from dataclasses import dataclass
-from tower.sprites import Background, Shrub, Enemy, Turret, Portal
+from tower.sprites import Background, Shrub, Enemy, Turret, Portal, Projectile
 from tower.grid import TILE_HEIGHT, TILE_WIDTH, get_tile_position
-from tower.sprites import layer
+from tower.sprites import layer, Vision
 from itertools import cycle
 from tower import asset_loader
 from tower.sprites import Enemy, AnimationState
 from tower.grid import make_enemy_path
+from tower.movement import create_projectile_path
+
 
 @dataclass
 class Spritemanager:
@@ -53,12 +56,13 @@ class Spritemanager:
             "up": (asset_loader.WALK_UP_FRAMES, None),
             "down": (asset_loader.WALK_DOWN_FRAMES, None),
         }
+        enemy.death_frames = (asset_loader.DEATH_FRAMES, asset_loader.DEATH_FRAMES_FLIPPED)
         enemy.set_direction("side")
         enemy.animation_state = AnimationState.walking
         enemy.path = make_enemy_path(start_tile, stop_positions)
         return enemy
 
-    def create_turret(self, position, orientation = None):
+    def create_turret(self, position, orientation = 0):
         turret = Turret.create_from_surface(
             #!sounds = None,
             groups = [self.layers],
@@ -73,13 +77,26 @@ class Spritemanager:
             AnimationState.idle:  cycle(range(len(asset_loader.TOWER_IDLE_FRAMES))),
         }
         turret.animation_state = AnimationState.idle
+        
+        turret.vision = Vision.create_vision(
+            rect = pygame.Rect(0, 0, 60, 180),
+            turret = turret,
+            groups = [self.layers],
+            orientation = orientation,
+        )
         return turret
     
-    def create_projectile(self, position, orientation = None):
+    def create_projectile(self, turret, enemy, orientation = None):
+        start = Vector(turret.rect.center)
+        stop = Vector(enemy.rect.center)
         projectile = Projectile.create_from_surface(
             groups = [self.layers],
-            surface = asset_loader,
+            surface = asset_loader.PORTAL_IDLE_FRAMES[0],
+            orientation = orientation,
+            position = start,
         )
+        projectile.explode_frames = (asset_loader.EXPLOSION_FRAMES, None)
+        projectile.path = create_projectile_path(start, stop, speed = 5, max_distance = 200)
         return projectile
 
     def create_portal(self, position, orientation = None):

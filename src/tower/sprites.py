@@ -159,6 +159,16 @@ class Sprite(pygame.sprite.Sprite):
     def generate_rotation(self):
         return None
     
+    def set_animation(self, state, source, source_flipped = None):
+        """Switch to a new one-shot animation, showing frame 0 immediately."""
+        self.frame_source = source
+        self.frame_source_flipped = source_flipped
+        self.frames = {state: iter(range(1, len(source)))}
+        self.animation_state = state
+        self._animation_tick = 0
+        self.index = 0
+        self.set_frame_by_index(0) 
+    
     def update(self):
         self.animate()
 
@@ -198,6 +208,7 @@ class Enemy(Sprite):
     _layer = layer.enemy
     direction = None
     direction_frame = None
+    death_frames = None
     
     def set_direction(self, direction):
         self.direction = direction
@@ -207,10 +218,19 @@ class Enemy(Sprite):
         self.frames = {AnimationState.walking: cycle(range(len(normal)))}
         self.index = 0
         self.set_frame_by_index(0)
+        
+    def die(self):
+        if self.animation_state == AnimationState.dying:
+            return
+        self.path = None
+        normal, flipped = self.death_frames
+        self.set_animation(AnimationState.dying, normal, flipped)
     
     def update(self):
         try:
             self.animate()
+            if self.animation_state == AnimationState.dying:
+                return
             if self.path is not None:
                 position, _, flipx, direction = next(self.path)
                 if direction != self.direction:
@@ -233,6 +253,44 @@ class Enemy(Sprite):
 class Turret(Sprite):
     
     _layer = layer.turret
+    vision = None
+    cooldown_ticks = 60
+    _cooldown = 0
+    
+    def update(self):
+        super().update()
+        if self._cooldown > 0:
+            self._cooldown -= 1
+            
+    def shoot(self):
+        """Returns True if turret is ready to fire, and starts the cooldown."""
+        if self._cooldown == 0:
+            self._cooldown = self.cooldown_ticks
+            return True
+        return False
+    
+    def kill(self):
+        if self.vision is not None:
+            self.vision.kill()
+        super().kill()
+    
+class Projectile(Sprite):
+    
+    _layer = layer.projectile
+    explode_frames = None
+    
+    def explode(self):
+        if self.animation_state == AnimationState.exploding:
+            return
+        self.path = None
+        normal, flipped = self.explode_frames
+        self.set_animation(AnimationState.exploding, normal, flipped)
+    
+    def update(self):
+        try:
+            super().update()
+        except StopIteration:
+            self.kill()
 
 class Portal(Sprite):
     

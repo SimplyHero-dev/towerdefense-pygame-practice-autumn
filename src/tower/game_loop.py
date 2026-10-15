@@ -250,8 +250,8 @@ class GameEditing(GameLoop):
             self.handle_events()
             self.screen.blit(background, (0, 0))
             self.layers.update()
-            self.layers.draw(self.screen)
             self.handle_collision()
+            self.layers.draw(self.screen)
             
             if self.placing == "tile":
                 gx, gy = get_tile_position(self.mouse_position)
@@ -264,7 +264,7 @@ class GameEditing(GameLoop):
 
     def handle_collision(self):
         enemies = self.layers.get_sprites_from_layer(layer.enemy)
-        turret_sights = self.layer.get_sprites_from_layer(layer.turret_sights)
+        turret_sights = self.layers.get_sprites_from_layer(layer.turret_sights)
         projectiles = self.layers.get_sprites_from_layer(layer.projectile)
         for enemy, turret_sights in collide_mask(enemies, turret_sights):
             for turret_sight in turret_sights:
@@ -276,8 +276,11 @@ class GameEditing(GameLoop):
                     )
         
         for enemy, projectiles in collide_mask(enemies, projectiles):
-            if enemy.animation_state == AnimationState.dying:
-                continue
-            enemy.animation_state = AnimationState.dying
+            enemy.die()
             for projectile in projectiles:
-                projectile.animation_state = AnimationState.exploding
+                projectile.explode()
+            # if enemy.animation_state == AnimationState.dying:
+            #     continue
+            # enemy.animation_state = AnimationState.dying
+            # for projectile in projectiles:
+            #     projectile.animation_state = AnimationState.exploding
