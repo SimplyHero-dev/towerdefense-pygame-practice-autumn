@@ -81,8 +81,8 @@ EXPLOSION_FRAMES = []
                 
 def load_all_animations():
     global WALK_FRAMES, WALK_FRAMES_FLIPPED, WALK_UP_FRAMES, WALK_DOWN_FRAMES
-    global TOWER_IDLE_FRAMES, PORTAL_IDLE_FRAMES
-    global DEATH_FRAMES, DEATH_FRAMES_FLIPPED, DEATH_UP_FRAMES, DEATH_DOWN_FRAMES, EXPLOSION_FRAMES
+    global TOWER_IDLE_FRAMES, PORTAL_IDLE_FRAMES, EXPLOSION_FRAMES, FIREBALL_FRAMES
+    global DEATH_FRAMES, DEATH_FRAMES_FLIPPED, DEATH_UP_FRAMES, DEATH_DOWN_FRAMES
     #enemy
     WALK_FRAMES_FLIPPED = import_spritesheet("S_Walk.png", frame_width = 48, frame_height = 48)
     WALK_FRAMES = [pygame.transform.flip(frame, True, False) for frame in WALK_FRAMES_FLIPPED]
@@ -95,6 +95,7 @@ def load_all_animations():
     #nonliving
     TOWER_IDLE_FRAMES = import_spritesheet("level7toweridle.png", frame_width = 70, frame_height = 130)
     PORTAL_IDLE_FRAMES = import_spritesheet("PORTAL BLUE-Sheet.png", frame_width = 64, frame_height = 64)
-    EXPLOSION_FRAMES = import_spritesheet("PORTAL BLUE-Sheet.png", frame_width = 64, frame_height = 64)
+    EXPLOSION_FRAMES = import_spritesheet("fireballExplosion2.png", frame_width = 32, frame_height = 32)
+    FIREBALL_FRAMES = import_spritesheet("fireballmoving.png", frame_width = 32, frame_height = 32)
 
 

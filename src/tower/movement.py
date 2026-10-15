@@ -20,7 +20,7 @@ def create_projectile_path(start, stop, speed, max_distance):
             func = operator.add,
             initial = start,
         ),
-        count(random.randint(0, 180)),
+        count(random.randint(0, 30)),
     )
     return path
 

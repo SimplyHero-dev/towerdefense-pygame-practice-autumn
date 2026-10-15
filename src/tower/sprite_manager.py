@@ -79,7 +79,7 @@ class Spritemanager:
         turret.animation_state = AnimationState.idle
         
         turret.vision = Vision.create_vision(
-            rect = pygame.Rect(0, 0, 60, 180),
+            rect = pygame.Rect(0, 0, 60, 300),
             turret = turret,
             groups = [self.layers],
             orientation = orientation,
@@ -89,12 +89,20 @@ class Spritemanager:
     def create_projectile(self, turret, enemy, orientation = None):
         start = Vector(turret.rect.center)
         stop = Vector(enemy.rect.center)
+        if start == stop:
+            return None
         projectile = Projectile.create_from_surface(
             groups = [self.layers],
-            surface = asset_loader.PORTAL_IDLE_FRAMES[0],
+            surface = asset_loader.FIREBALL_FRAMES[0],
             orientation = orientation,
             position = start,
         )
+        projectile.frame_source = asset_loader.FIREBALL_FRAMES
+        projectile.frame_source_flipped = None
+        projectile.frames = {
+            AnimationState.idle: cycle(range(len(asset_loader.FIREBALL_FRAMES))),
+        }
+        projectile.animation_state = AnimationState.idle
         projectile.explode_frames = (asset_loader.EXPLOSION_FRAMES, None)
         projectile.path = create_projectile_path(start, stop, speed = 5, max_distance = 200)
         return projectile
